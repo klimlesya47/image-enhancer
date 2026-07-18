@@ -1,3 +1,4 @@
+import weightsUrl from "./weights.json?url";
 import { applyCorrection } from "./correction";
 import { runForward, type ModelWeights } from "./inference";
 
@@ -6,7 +7,7 @@ const abortedTasks = new Set<string>();
 
 function getWeights(): Promise<ModelWeights> {
   if (!weightsPromise) {
-    weightsPromise = fetch("/weights.json").then((r) => r.json());
+    weightsPromise = fetch(weightsUrl).then((r) => r.json());
   }
   return weightsPromise;
 }
@@ -19,6 +20,12 @@ async function decodeImage(blob: Blob): Promise<ImageBitmap> {
   return await createImageBitmap(blob);
 }
 
+/**
+ * Прогоняет уменьшенное превью (224x224) через ручной forward pass
+ * (без ONNX Runtime — см. inference.ts) и возвращает
+ * [brightness, contrast, saturation]. contrast/saturation уже
+ * экспоненцированы внутри runForward (модель обучена в лог-пространстве).
+ */
 async function runInference(bitmap: ImageBitmap): Promise<[number, number, number]> {
   const size = 224;
   const canvas = new OffscreenCanvas(size, size);
@@ -26,6 +33,7 @@ async function runInference(bitmap: ImageBitmap): Promise<[number, number, numbe
   ctx.drawImage(bitmap, 0, 0, size, size);
   const imgData = ctx.getImageData(0, 0, size, size);
 
+  // CHW, нормализация в [0,1]
   const inputCHW = new Float32Array(3 * size * size);
   for (let i = 0; i < size * size; i++) {
     inputCHW[i] = imgData.data[i * 4] / 255; // R

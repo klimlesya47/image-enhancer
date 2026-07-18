@@ -3,7 +3,7 @@
 Система улучшения изображений (яркость, контрастность, насыщенность) на основе
 компактной нейросети.
 
-Демо: https://github.com/klimlesya47/image-enhancer
+Демо: https://klimlesya47.github.io/image-enhancer/
 
 ## Как это работает
 

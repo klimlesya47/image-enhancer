@@ -7,6 +7,7 @@ const progressEl = document.querySelector<HTMLDivElement>("#progress")!;
 const abortBtn = document.querySelector<HTMLButtonElement>("#abort-btn")!;
 const originalImg = document.querySelector<HTMLImageElement>("#original")!;
 const resultImg = document.querySelector<HTMLImageElement>("#result")!;
+const downloadLink = document.querySelector<HTMLAnchorElement>("#download-link")!;
 
 let currentTaskId: string | null = null;
 
@@ -16,6 +17,7 @@ input.addEventListener("change", async () => {
 
   originalImg.removeAttribute("src");
   resultImg.removeAttribute("src");
+  downloadLink.classList.add("hidden");
   abortBtn.disabled = false;
 
   let blob: Blob;
@@ -37,7 +39,13 @@ input.addEventListener("change", async () => {
     progressEl.textContent = `${state.status} — ${state.progress}%`;
 
     if (state.status === "done" && state.result) {
-      resultImg.src = URL.createObjectURL(state.result);
+      const resultUrl = URL.createObjectURL(state.result);
+      resultImg.src = resultUrl;
+
+      downloadLink.href = resultUrl;
+      downloadLink.download = buildDownloadName(file.name);
+      downloadLink.classList.remove("hidden");
+
       abortBtn.disabled = true;
       currentTaskId = null;
       unsubscribe();
@@ -62,3 +70,9 @@ abortBtn.addEventListener("click", async () => {
   if (!currentTaskId) return;
   await api.abortTask(currentTaskId);
 });
+
+function buildDownloadName(originalName: string): string {
+  const dotIndex = originalName.lastIndexOf(".");
+  const base = dotIndex === -1 ? originalName : originalName.slice(0, dotIndex);
+  return `${base}_enhanced.jpg`;
+}

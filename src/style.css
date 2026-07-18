@@ -17,6 +17,7 @@ body {
 
 .comparison {
   display: flex;
+  flex-direction: row;
   gap: 16px;
   margin-top: 16px;
 }
@@ -39,4 +40,24 @@ body {
   border-radius: 8px;
   background: #f0f0f0;
   min-height: 100px;
+}
+
+#download-link {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 8px 16px;
+  background: #2563eb;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+}
+
+#download-link:hover {
+  background: #1d4ed8;
+}
+
+#download-link.hidden {
+  display: none;
 }
